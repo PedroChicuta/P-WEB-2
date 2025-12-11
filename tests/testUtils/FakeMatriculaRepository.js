@@ -1,4 +1,3 @@
-// Arquivo: tests/testUtils/FakeMatriculaRepository.js
 const MatriculaRepository = require('../../domain/ports/MatriculaRepository');
 
 class FakeMatriculaRepository extends MatriculaRepository {
