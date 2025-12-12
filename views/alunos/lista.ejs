@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+    <h2>Alunos</h2>
+    
+    <form action="/alunos" method="GET" style="margin-bottom: 20px;">
+        <input type="text" name="busca" placeholder="Buscar por nome..." style="width: 70%; display:inline;">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        <% if (locals.busca) { %> <a href="/alunos">Limpar</a> <% } %>
+    </form>
+
+    <a href="/alunos/novo" class="btn btn-primary">Novo Aluno</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% alunos.forEach(aluno => { %>
+                <tr>
+                    <td><%= aluno.matricula %></td>
+                    <td><%= aluno.nome %></td>
+                    <td><%= aluno.email %></td>
+                    <td>
+                        <a href="/alunos/editar/<%= aluno.id %>" class="btn btn-primary">Editar</a>
+                        
+                        <form action="/alunos/delete/<%= aluno.id %>" method="POST" style="display:inline" 
+                              onsubmit="return confirm('Tem certeza que deseja excluir <%= aluno.nome %>?');">
+                            <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<%- include('../partials/footer') %>

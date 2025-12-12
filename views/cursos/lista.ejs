@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+    <h2>Gerenciar Cursos</h2>
+    <a href="/cursos/novo" class="btn btn-primary">Novo Curso</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Carga Horária</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% cursos.forEach(curso => { %>
+                <tr>
+                    <td><%= curso.nome %></td>
+                    <td><%= curso.cargaHoraria %></td>
+                    <td>
+                        <% if(curso.ativo) { %>
+                            <span class="status-ativa">Ativo</span>
+                        <% } else { %>
+                            <span class="status-trancada">Inativo</span>
+                        <% } %>
+                    </td>
+                    <td>
+                        <a href="/cursos/editar/<%= curso.id %>" class="btn btn-primary">Editar</a>
+                        
+                        <form action="/cursos/toggle/<%= curso.id %>" method="POST" style="display:inline;">
+                            <button type="submit" class="btn <%= curso.ativo ? 'btn-danger' : 'btn-success' %>">
+                                <%= curso.ativo ? 'Desativar' : 'Ativar' %>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<%- include('../partials/footer') %>

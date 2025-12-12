@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+    <h2><%= aluno.id ? 'Editar' : 'Novo' %> Aluno</h2>
+    
+    <form action="/alunos/salvar" method="POST">
+        <input type="hidden" name="id" value="<%= aluno.id || '' %>">
+        
+        <div class="form-group">
+            <label>Nome:</label>
+            <input type="text" name="nome" value="<%= aluno.nome || '' %>" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" name="email" value="<%= aluno.email || '' %>" required>
+        </div>
+
+        <div class="form-group">
+            <label>Matrícula (Código):</label>
+            <input type="text" name="matricula" value="<%= aluno.matricula || '' %>" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="/alunos" class="btn btn-danger">Cancelar</a>
+    </form>
+<%- include('../partials/footer') %>

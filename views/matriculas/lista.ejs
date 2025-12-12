@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+    <h2>Gerenciar Matrículas</h2>
+
+    <form action="/matriculas" method="GET" style="margin-bottom: 20px;">
+        <label>Filtrar por Status:</label>
+        <select name="status" onchange="this.form.submit()" style="width: 200px; display:inline;">
+            <option value="">Todos</option>
+            <option value="ativa" <%= locals.status === 'ativa' ? 'selected' : '' %>>Ativas</option>
+            <option value="trancada" <%= locals.status === 'trancada' ? 'selected' : '' %>>Trancadas</option>
+            <option value="concluída" <%= locals.status === 'concluída' ? 'selected' : '' %>>Concluídas</option>
+        </select>
+    </form>
+
+    <a href="/matriculas/nova" class="btn btn-primary">Nova Matrícula</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Aluno</th>
+                <th>Curso</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% matriculas.forEach(mat => { %>
+                <tr>
+                    <td><%= mat.id %></td>
+                    <td><%= mat.Aluno ? mat.Aluno.nome : mat.alunoId %></td>
+                    <td><%= mat.Curso ? mat.Curso.nome : mat.cursoId %></td>
+                    <td><%= new Date(mat.data).toLocaleDateString('pt-BR') %></td>
+                    
+                    <td class="status-<%= mat.status %>"><%= mat.status %></td>
+                    
+                    <td>
+                        <% if(mat.status === 'ativa') { %>
+                            <form action="/matriculas/status/<%= mat.id %>" method="POST" style="display:inline">
+                                <input type="hidden" name="status" value="concluída">
+                                <button class="btn btn-success" title="Concluir">✔</button>
+                            </form>
+                            <form action="/matriculas/status/<%= mat.id %>" method="POST" style="display:inline">
+                                <input type="hidden" name="status" value="trancada">
+                                <button class="btn btn-danger" title="Trancar">🔒</button>
+                            </form>
+                        <% } %>
+
+                        <form action="/matriculas/delete/<%= mat.id %>" method="POST" style="display:inline"
+                              onsubmit="return confirm('Excluir esta matrícula?');">
+                            <button class="btn btn-danger" style="margin-left:5px">X</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<%- include('../partials/footer') %>
