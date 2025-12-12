@@ -4,6 +4,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const {
+  sequelize,
+  AlunoModel,
+  CursoModel,
+  MatriculaModel,
+  alunoService,
+  cursoService,
+  matriculaService
+} = require('./container/index.js');
+
 const indexRouter = require('./routes/index');
 const alunoRouter = require('./routes/aluno');
 const cursoRouter = require('./routes/curso');
@@ -22,8 +32,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/aluno', alunoRouter);
-app.use('/curso', cursoRouter);
-app.use('/matricula', matriculaRouter);
+app.use('/alunos', alunoRouter(alunoService));
+app.use('/cursos', cursoRouter(cursoService));
+app.use('/matriculas', matriculaRouter(matriculaService));
 
 module.exports = app;

@@ -1,4 +1,4 @@
-const MatriculaRepository = require('../../domain/ports/Matricula');
+const MatriculaRepository = require('../../domain/ports/MatriculaRepository');
 const Matricula = require('../../domain/entities/Matricula');
 
 class MatriculaRepositorySequelize extends MatriculaRepository{
