@@ -50,6 +50,8 @@ class AlunoController {
     async salvar(req, res) {
         const errors = validationResult(req);
 
+        console.log(errors);
+
         const aluno = this._payload(req.body);
         aluno.id = req.body.id || null;
 
@@ -76,7 +78,7 @@ class AlunoController {
 
         if (!aluno) return res.redirect("/alunos");
 
-        res.render("aluno/form", { aluno, errors: {} });
+        res.render("alunos/form", { aluno, errors: {} });
     }
 
     // EXCLUIR
