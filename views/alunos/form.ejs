@@ -1,25 +1,50 @@
 <%- include('../partials/header') %>
+
     <h2><%= aluno.id ? 'Editar' : 'Novo' %> Aluno</h2>
     
+    <% if (locals.mensagem) { %>
+        <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            ✅ <%= mensagem %>
+        </div>
+    <% } %>
+
     <form action="/alunos/salvar" method="POST">
         <input type="hidden" name="id" value="<%= aluno.id || '' %>">
         
         <div class="form-group">
             <label>Nome:</label>
             <input type="text" name="nome" value="<%= aluno.nome || '' %>" required>
+            <% if (locals.errors && errors.nome) { %>
+                <div style="color: red; font-size: 0.9em; margin-top: 5px;">
+                    <%= errors.nome.msg %>
+                </div>
+            <% } %>
         </div>
 
         <div class="form-group">
             <label>Email:</label>
             <input type="email" name="email" value="<%= aluno.email || '' %>" required>
+            <% if (locals.errors && errors.email) { %>
+                <div style="color: red; font-size: 0.9em; margin-top: 5px;">
+                    <%= errors.email.msg %>
+                </div>
+            <% } %>
         </div>
 
         <div class="form-group">
             <label>Matrícula (Código):</label>
             <input type="text" name="matricula" value="<%= aluno.matricula || '' %>" required>
+            <% if (locals.errors && errors.matricula) { %>
+                <div style="color: red; font-size: 0.9em; margin-top: 5px;">
+                    <%= errors.matricula.msg %>
+                </div>
+            <% } %>
         </div>
+
+        <br>
 
         <button type="submit" class="btn btn-success">Salvar</button>
         <a href="/alunos" class="btn btn-danger">Cancelar</a>
     </form>
+
 <%- include('../partials/footer') %>

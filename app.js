@@ -24,7 +24,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -32,8 +31,15 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+
+// Rota de Aluno recebe 1 serviço
 app.use('/alunos', alunoRouter(alunoService));
+
+// Rota de Curso recebe 1 serviço
 app.use('/cursos', cursoRouter(cursoService));
-app.use('/matriculas', matriculaRouter(matriculaService));
+
+// Rota de Matrícula recebe 3 serviços (Matricula, Aluno, Curso)
+// Isso permite que o controller busque a lista de alunos e cursos para o formulário
+app.use('/matriculas', matriculaRouter(matriculaService, alunoService, cursoService));
 
 module.exports = app;

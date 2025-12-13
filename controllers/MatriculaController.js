@@ -1,97 +1,107 @@
 const { body, validationResult } = require('express-validator');
 
+
 const regras = [
-    body('aluno_id')
-        .notEmpty().withMessage('Selecione um aluno.')
-        .isInt().withMessage('ID de aluno inválido.'),
-
-    body('curso_id')
-        .notEmpty().withMessage('Selecione um curso.')
-        .isInt().withMessage('ID de curso inválido.'),
-
-    body('data_matricula')
-        .optional()
-        .isISO8601().withMessage('Data inválida.')
+    body('alunoId').notEmpty().withMessage('Selecione um aluno.').isInt(),
+    body('cursoId').notEmpty().withMessage('Selecione um curso.').isInt(),
+    body('data').optional().isISO8601().withMessage('Data inválida.')
 ];
 
 class MatriculaController {
-    constructor(service) {
-        this.service = service;
+    constructor(matriculaService, alunoService, cursoService) {
+        this.service = matriculaService;
+        this.alunoService = alunoService;
+        this.cursoService = cursoService;
     }
 
     regrasCriar() { return regras; }
-    regrasEditar() { return regras; }
 
     // LISTA
     async lista(req, res) {
-        const busca = req.query.busca;
+        const statusFiltro = req.query.status; 
+        const todas = await this.service.getAll();
 
-        const matriculas = busca
-            ? await this.service.find(busca)
-            : await this.service.getAll();
+        let matriculas = todas;
+        if (statusFiltro) {
+            matriculas = todas.filter(m => m.status === statusFiltro);
+        }
+
+        let mensagem = null;
+        if (req.query.msg === 'criada') mensagem = 'Matrícula realizada com sucesso!';
+        if (req.query.msg === 'status') mensagem = 'Status da matrícula alterado!';
+        if (req.query.msg === 'deletada') mensagem = 'Matrícula excluída!';
 
         res.render("matriculas/lista", {
             matriculas,
-            busca
+            status: statusFiltro,
+            mensagem
         });
     }
 
-    // FORM - NOVO
+    // FORM - NOVO (Carrega Alunos e Cursos)
     async novoForm(req, res) {
-        // Possível: passar lista de alunos e cursos
-        // const alunos = await this.service.getAlunos();
-        // const cursos = await this.service.getCursos();
+        try {
+            const alunos = await this.alunoService.getAll();
+            // Filtra apenas cursos ativos para nova matrícula
+            const cursosTodos = await this.cursoService.getAll();
+            const cursosAtivos = cursosTodos.filter(c => c.ativo);
 
-        res.render("matriculas/form", { matricula: {}, errors: {} });
+            res.render("matriculas/form", { 
+                matricula: {}, 
+                alunos, 
+                cursos: cursosAtivos, 
+                errors: {} 
+            });
+        } catch (erro) {
+            console.log(erro);
+            res.redirect('/matriculas');
+        }
     }
 
-    // CREATE / UPDATE
+    // SALVAR 
     async salvar(req, res) {
         const errors = validationResult(req);
-
-        const matricula = this._payload(req.body);
-        matricula.id = req.body.id || null;
-
+        
         if (!errors.isEmpty()) {
+            // Se der erro, precisamos recarregar as listas para o select não sumir
+            const alunos = await this.alunoService.getAll();
+            const cursos = await this.cursoService.getAll();
             return res.status(400).render("matriculas/form", {
-                matricula,
+                matricula: req.body,
+                alunos,
+                cursos,
                 errors: errors.mapped()
             });
         }
 
-        if (matricula.id) {
-            await this.service.update(matricula.id, matricula);
-        } else {
-            await this.service.create(matricula);
-        }
+        const dados = {
+            alunoId: req.body.alunoId,
+            cursoId: req.body.cursoId,
+            data: req.body.data || new Date(),
+            status: 'ativa'
+        };
 
-        return res.redirect("/matriculas");
+        await this.service.create(dados);
+        return res.redirect("/matriculas?msg=criada");
     }
 
-    // FORM EDITAR
-    async editarForm(req, res) {
+    // ALTERAR STATUS (Trancar/Concluir)
+    async alterarStatus(req, res) {
         const id = Number(req.params.id);
-        const matricula = await this.service.find(id);
-
-        if (!matricula) return res.redirect("/matriculas");
-
-        res.render("matriculas/form", { matricula, errors: {} });
+        const novoStatus = req.body.status; 
+        
+        const mat = await this.service.find(id);
+        if (mat) {
+            mat.status = novoStatus;
+            await this.service.update(id, mat);
+        }
+        res.redirect('/matriculas?msg=status');
     }
 
-    // EXCLUIR
     async excluir(req, res) {
         const id = Number(req.params.id);
         await this.service.delete(id);
-        return res.redirect("/matriculas");
-    }
-
-    // TRATA OS CAMPOS DO FORM
-    _payload(body) {
-        return {
-            aluno_id: body.aluno_id,
-            curso_id: body.curso_id,
-            data_matricula: body.data_matricula || null
-        };
+        return res.redirect("/matriculas?msg=deletada");
     }
 }
 

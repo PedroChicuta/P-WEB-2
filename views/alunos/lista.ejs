@@ -1,39 +1,53 @@
 <%- include('../partials/header') %>
+
     <h2>Alunos</h2>
     
+    <% if (locals.mensagem) { %>
+        <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-weight: bold;">
+            ✅ <%= mensagem %>
+        </div>
+    <% } %>
+
     <form action="/alunos" method="GET" style="margin-bottom: 20px;">
-        <input type="text" name="busca" placeholder="Buscar por nome..." style="width: 70%; display:inline;">
+        <input type="text" name="busca" placeholder="Buscar por nome..." value="<%= locals.busca || '' %>" style="width: 70%; display:inline; padding: 5px;">
         <button type="submit" class="btn btn-primary">Buscar</button>
-        <% if (locals.busca) { %> <a href="/alunos">Limpar</a> <% } %>
+        <% if (locals.busca) { %> <a href="/alunos" style="margin-left: 10px;">Limpar</a> <% } %>
     </form>
 
-    <a href="/alunos/novo" class="btn btn-primary">Novo Aluno</a>
+    <a href="/alunos/novo" class="btn btn-primary" style="margin-bottom: 10px; display: inline-block;">Novo Aluno</a>
 
-    <table>
+    <table style="width: 100%; border-collapse: collapse;">
         <thead>
-            <tr>
-                <th>Matrícula</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Ações</th>
+            <tr style="background-color: #333; color: white;">
+                <th style="padding: 10px;">Matrícula</th>
+                <th style="padding: 10px;">Nome</th>
+                <th style="padding: 10px;">Email</th>
+                <th style="padding: 10px;">Ações</th>
             </tr>
         </thead>
         <tbody>
-            <% alunos.forEach(aluno => { %>
+            <% if (!locals.alunos || alunos.length === 0) { %>
                 <tr>
-                    <td><%= aluno.matricula %></td>
-                    <td><%= aluno.nome %></td>
-                    <td><%= aluno.email %></td>
-                    <td>
-                        <a href="/alunos/editar/<%= aluno.id %>" class="btn btn-primary">Editar</a>
-                        
-                        <form action="/alunos/delete/<%= aluno.id %>" method="POST" style="display:inline" 
-                              onsubmit="return confirm('Tem certeza que deseja excluir <%= aluno.nome %>?');">
-                            <button type="submit" class="btn btn-danger">Excluir</button>
-                        </form>
-                    </td>
+                    <td colspan="4" style="text-align: center; padding: 20px;">Nenhum aluno encontrado.</td>
                 </tr>
-            <% }) %>
+            <% } else { %>
+                <% alunos.forEach(aluno => { %>
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px;"><%= aluno.matricula %></td>
+                        <td style="padding: 10px;"><%= aluno.nome %></td>
+                        <td style="padding: 10px;"><%= aluno.email %></td>
+                        <td style="padding: 10px;">
+                            <a href="/alunos/editar/<%= aluno.id %>" class="btn btn-primary">Editar</a>
+                            
+                            <form action="/alunos/delete/<%= aluno.id %>" method="POST" style="display:inline" 
+                                  onsubmit="return confirm('Tem certeza que deseja excluir <%= aluno.nome %>?');">
+                                <button type="submit" class="btn btn-danger">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
         </tbody>
     </table>
+
 <%- include('../partials/footer') %>

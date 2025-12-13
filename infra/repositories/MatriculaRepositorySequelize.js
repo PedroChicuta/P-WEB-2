@@ -1,11 +1,7 @@
 const MatriculaRepository = require('../../domain/ports/MatriculaRepository');
 const Matricula = require('../../domain/entities/Matricula');
 
-class MatriculaRepositorySequelize extends MatriculaRepository{
-
-    /**
-    * @param {Model} MatriculaModel
-    */
+class MatriculaRepositorySequelize extends MatriculaRepository {
     constructor(MatriculaModel) {
         super();
         this.MatriculaModel = MatriculaModel;
@@ -13,38 +9,18 @@ class MatriculaRepositorySequelize extends MatriculaRepository{
 
     _rowToEntity(row) {
         if (!row) return null;
-        return new Matricula({
-            id: row.id,
-            alunoId: row.alunoId,
-            cursoId: row.cursoId,
-            data: row.data,
-            status: row.status,
-        });
+        // Precisamos retornar o JSON puro para levar os objetos Aluno e Curso juntos para a View
+        return row.toJSON(); 
     }
 
     async create(matricula) {
-        const row = await this.MatriculaModel.create({
-            alunoId: matricula.alunoId,
-            cursoId: matricula.cursoId,
-            data: matricula.data,
-            status: matricula.status,
-        });
-
-        return this._rowToEntity(row.toJSON());
+        const row = await this.MatriculaModel.create(matricula);
+        return this._rowToEntity(row);
     }
 
     async update(matricula) {
-        await this.MatriculaModel.update({
-            alunoId: matricula.alunoId,
-            cursoId: matricula.cursoId,
-            data: matricula.data,
-            status: matricula.status,
-        }, {
-            where: { id: matricula.id }
-        });
-
-        const row = await this.MatriculaModel.findByPk(matricula.id);
-        return this._rowToEntity(row ? row.toJSON() : null);
+        await this.MatriculaModel.update(matricula, { where: { id: matricula.id } });
+        return this.findById(matricula.id);
     }
 
     async deleteById(id) {
@@ -52,16 +28,19 @@ class MatriculaRepositorySequelize extends MatriculaRepository{
     }
 
     async findAll() {
-        const rows = await this.MatriculaModel.findAll();
-        return rows.map(r => this._rowToEntity(r.toJSON()));
+        const rows = await this.MatriculaModel.findAll({
+            include: ['Aluno', 'Curso'], // Traz os dados das tabelas relacionadas
+            order: [['data', 'DESC']]
+        });
+        return rows.map(r => this._rowToEntity(r));
     }
 
     async findById(id) {
-        const row = await this.MatriculaModel.findByPk(id);
-        return this._rowToEntity(row ? row.toJSON() : null);
+        const row = await this.MatriculaModel.findByPk(id, {
+            include: ['Aluno', 'Curso']
+        });
+        return this._rowToEntity(row);
     }
-
-
 }
 
 module.exports = MatriculaRepositorySequelize;

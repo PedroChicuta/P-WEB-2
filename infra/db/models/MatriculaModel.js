@@ -10,24 +10,23 @@ function defineMatriculaModel(sequelize) {
         cursoId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'Cursos',
-                key: 'id'
-            }
+            references: { model: 'Cursos', key: 'id' }
         },
         alunoId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'Alunos',
-                key: 'id'
-            }
+            references: { model: 'Alunos', key: 'id' }
         },
         data: {
             type: DataTypes.DATE,
             allowNull: false,
             defaultValue: DataTypes.NOW
         },
+        status: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'ativa' // ativa, trancada, concluída
+        }
     });
 
     return MatriculaModel;
