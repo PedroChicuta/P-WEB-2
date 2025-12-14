@@ -1,9 +1,9 @@
 <%- include('../partials/header') %>
     <h2>Nova Matrícula</h2>
     
-    <% if (locals.erro) { %>
+    <% if (errors && errors.matricula) { %>
         <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
-            <%= erro %>
+            <%= errors.matricula %>
         </div>
     <% } %>
 

@@ -32,7 +32,7 @@ CursoModel.hasMany(MatriculaModel, { foreignKey: 'cursoId' });
 
 
 
-sequelize.sync()
+sequelize.sync({alter:true})
   .then(() => console.log('Banco sincronizado com Sequelize (ORM).'))
   .catch(err => console.error('Erro ao sincronizar banco:', err));
 
@@ -44,7 +44,7 @@ const matriculaRepository = new MatriculaRepositorySequelize(MatriculaModel);
 
 const alunoService = new AlunoService(alunoRepository);
 const cursoService = new CursoService(cursoRepository);
-const matriculaService = new MatriculaService(matriculaRepository);
+const matriculaService = new MatriculaService(matriculaRepository, alunoService, cursoService);
 
 module.exports = {
   sequelize,

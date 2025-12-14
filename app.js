@@ -38,8 +38,6 @@ app.use('/alunos', alunoRouter(alunoService));
 // Rota de Curso recebe 1 serviço
 app.use('/cursos', cursoRouter(cursoService));
 
-// Rota de Matrícula recebe 3 serviços (Matricula, Aluno, Curso)
-// Isso permite que o controller busque a lista de alunos e cursos para o formulário
-app.use('/matriculas', matriculaRouter(matriculaService, alunoService, cursoService));
+app.use('/matriculas', matriculaRouter(matriculaService));
 
 module.exports = app;
